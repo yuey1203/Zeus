@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 2.8)
+
+project(object_detect)
+
+find_package(PCL 1.2 REQUIRED)
+
+include_directories(
+    include
+    ${PCL_INCLUDE_DIRS}
+)
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+set(all_libs
+    ${PCL_LIBRARIES}
+)
+
+set(object_detect_sources
+    src/pcd_read.cpp
+)
+
+add_executable (run_object_detect ${object_detect_sources})
+target_link_libraries (run_object_detect ${object_detect_sources})
