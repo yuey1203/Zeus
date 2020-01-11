@@ -10,12 +10,13 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/filters/passthrough.h>
 
 #include "time.h"
 #include "cluster_extraction.h"
 
-
-
+#define MIN_HEIGHT -100.0
+#define MAX_HEIGHT 100.0
 
 void find_clusters(pcl_ptr & cloud_filtered, std::vector<pcl::PointIndices> & cluster_groupings){
 
@@ -73,20 +74,29 @@ void find_clusters(pcl_ptr & cloud_filtered, std::vector<pcl::PointIndices> & cl
   ec.extract (cluster_groupings);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
   // Read in the cloud data
   pcl::PCDReader reader;
   pcl_ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  reader.read ("table_scene_lms400.pcd", *cloud);
+  pcl_ptr cloud_vg (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl_ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+  std::cout << "Input Cloud File: " << argv[1] << std::endl;
+  reader.read (argv[1], *cloud);
   std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 
   // Create the filtering object: downsample the dataset using a leaf size of 1cm
   pcl::VoxelGrid<pcl::PointXYZ> vg;
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
   vg.setInputCloud (cloud);
   vg.setLeafSize (0.01f, 0.01f, 0.01f);
-  vg.filter (*cloud_filtered);
-  std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
+  vg.filter (*cloud_vg);
+  
+  // Create the filtering object: remove ground plane by thresholding height
+  pcl::PassThrough<pcl::PointXYZ> pass;
+  pass.setInputCloud (cloud_vg);
+  pass.setFilterFieldName ("z");
+  pass.setFilterLimits (MIN_HEIGHT, MAX_HEIGHT);
+  //pass.setFilterLimitsNegative (true);
+  pass.filter (*cloud_filtered);
 
   std::vector<pcl::PointIndices> cluster_groupings;
   find_clusters(cloud_filtered, cluster_groupings);
