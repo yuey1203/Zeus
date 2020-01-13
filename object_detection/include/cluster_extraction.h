@@ -13,4 +13,6 @@
 
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr;
 
+void filter_voxel_height(const pcl_ptr & orig, pcl_ptr & cloud_filtered);
+
 void find_clusters(pcl_ptr & cloud_filtered, std::vector<pcl::PointIndices> & cluster_groupings);

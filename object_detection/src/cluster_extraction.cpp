@@ -18,6 +18,24 @@
 #define MIN_HEIGHT -100.0
 #define MAX_HEIGHT 100.0
 
+void filter_voxel_height(const pcl_ptr & orig, pcl_ptr & cloud_filtered) {
+  pcl_ptr cloud_vg (new pcl::PointCloud<pcl::PointXYZ>);
+
+  // Create the filtering object: downsample the dataset using a leaf size of 1cm
+  pcl::VoxelGrid<pcl::PointXYZ> vg;
+  vg.setInputCloud (orig);
+  vg.setLeafSize (0.01f, 0.01f, 0.01f);
+  vg.filter (*cloud_vg);
+  
+  // Create the filtering object: remove ground plane by thresholding height
+  pcl::PassThrough<pcl::PointXYZ> pass;
+  pass.setInputCloud (cloud_vg);
+  pass.setFilterFieldName ("z");
+  pass.setFilterLimits (MIN_HEIGHT, MAX_HEIGHT);
+  //pass.setFilterLimitsNegative (true);
+  pass.filter (*cloud_filtered);
+}
+
 void find_clusters(pcl_ptr & cloud_filtered, std::vector<pcl::PointIndices> & cluster_groupings){
 
   // Create the segmentation object for the planar model and set all the parameters
@@ -74,32 +92,7 @@ void find_clusters(pcl_ptr & cloud_filtered, std::vector<pcl::PointIndices> & cl
   ec.extract (cluster_groupings);
 }
 
-int main(int argc, char* argv[]) {
-  // Read in the cloud data
-  pcl::PCDReader reader;
-  pcl_ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl_ptr cloud_vg (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl_ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
-  std::cout << "Input Cloud File: " << argv[1] << std::endl;
-  reader.read (argv[1], *cloud);
-  std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
-
-  // Create the filtering object: downsample the dataset using a leaf size of 1cm
-  pcl::VoxelGrid<pcl::PointXYZ> vg;
-  vg.setInputCloud (cloud);
-  vg.setLeafSize (0.01f, 0.01f, 0.01f);
-  vg.filter (*cloud_vg);
-  
-  // Create the filtering object: remove ground plane by thresholding height
-  pcl::PassThrough<pcl::PointXYZ> pass;
-  pass.setInputCloud (cloud_vg);
-  pass.setFilterFieldName ("z");
-  pass.setFilterLimits (MIN_HEIGHT, MAX_HEIGHT);
-  //pass.setFilterLimitsNegative (true);
-  pass.filter (*cloud_filtered);
-
-  std::vector<pcl::PointIndices> cluster_groupings;
-  find_clusters(cloud_filtered, cluster_groupings);
+void visualize_pc_clusters(std::vector<pcl::PointIndices> & cluster_groupings) {
 
   pcl::visualization::PCLVisualizer viewer("Cloud Viewer");
   srand(time(NULL));
@@ -119,7 +112,6 @@ int main(int argc, char* argv[]) {
     ss << "cloud_cluster_" << j;
     j++;
 
-
     r = rand() % 255;
     g = rand() % 255;
     b = rand() % 255;
@@ -129,6 +121,4 @@ int main(int argc, char* argv[]) {
     
   }
   viewer.spin();
-
-  return (0);
 }
