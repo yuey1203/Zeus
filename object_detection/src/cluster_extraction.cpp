@@ -84,15 +84,16 @@ void find_clusters(pcl_ptr & cloud_filtered, std::vector<pcl::PointIndices> & cl
   tree->setInputCloud (cloud_filtered);
 
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-  ec.setClusterTolerance (0.02); // 2cm
-  ec.setMinClusterSize (100);
-  ec.setMaxClusterSize (25000);
+  ec.setClusterTolerance (0.08); // 2cm
+  ec.setMinClusterSize (20000);
+  ec.setMaxClusterSize (50000);
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_filtered);
   ec.extract (cluster_groupings);
 }
 
-void visualize_pc_clusters(std::vector<pcl::PointIndices> & cluster_groupings) {
+void visualize_pc_clusters(std::vector<pcl::PointIndices> & cluster_groupings,
+    const pcl_ptr & cloud) {
 
   pcl::visualization::PCLVisualizer viewer("Cloud Viewer");
   srand(time(NULL));
@@ -102,7 +103,7 @@ void visualize_pc_clusters(std::vector<pcl::PointIndices> & cluster_groupings) {
   {
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
     for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
-      cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
+      cloud_cluster->points.push_back (cloud->points[*pit]); //*
     cloud_cluster->width = cloud_cluster->points.size ();
     cloud_cluster->height = 1;
     cloud_cluster->is_dense = true;

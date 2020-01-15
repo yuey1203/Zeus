@@ -29,37 +29,46 @@ int main(int argc, char* argv[]) {
 
   filter_voxel_height(cloud, cloud_filtered);
 
-  std::vector<pcl::PointIndices> cluster_groupings;
-  find_clusters(cloud_filtered, cluster_groupings);
-
+  // Visualize bare point cloud
   pcl::visualization::PCLVisualizer viewer("Cloud Viewer");
-  srand(time(NULL));
-  int j = 0;
-  int r, g, b;
-  for (std::vector<pcl::PointIndices>::const_iterator it = cluster_groupings.begin (); it != cluster_groupings.end (); ++it)
-  {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
-    for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
-      cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
-      
-    cloud_cluster->width = cloud_cluster->points.size ();
-    cloud_cluster->height = 1;
-    cloud_cluster->is_dense = true;
-
-    std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
-    std::stringstream ss;
-    ss << "cloud_cluster_" << j;
-    j++;
-
-    r = rand() % 255;
-    g = rand() % 255;
-    b = rand() % 255;
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(
-      cloud_cluster, r, g, b);
-    viewer.addPointCloud (cloud_cluster, single_color, ss.str());// note that before it was showCloud
-    
-  }
+  pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(
+      cloud_filtered, 255, 255, 255);
+  viewer.addPointCloud (cloud_filtered, single_color, "View PC");// note that before it was showCloud
   viewer.spin();
+  return 0;
+  
 
-  return (0);
+  // std::vector<pcl::PointIndices> cluster_groupings;
+  // find_clusters(cloud_filtered, cluster_groupings);
+
+  // pcl::visualization::PCLVisualizer viewer("Cloud Viewer");
+  // srand(time(NULL));
+  // int j = 0;
+  // int r, g, b;
+  // for (std::vector<pcl::PointIndices>::const_iterator it = cluster_groupings.begin (); it != cluster_groupings.end (); ++it)
+  // {
+  //   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+  //   for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+  //     cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
+      
+  //   cloud_cluster->width = cloud_cluster->points.size ();
+  //   cloud_cluster->height = 1;
+  //   cloud_cluster->is_dense = true;
+
+  //   std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
+  //   std::stringstream ss;
+  //   ss << "cloud_cluster_" << j;
+  //   j++;
+
+  //   r = rand() % 255;
+  //   g = rand() % 255;
+  //   b = rand() % 255;
+  //   pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(
+  //     cloud_cluster, r, g, b);
+  //   viewer.addPointCloud (cloud_cluster, single_color, ss.str());// note that before it was showCloud
+    
+  // }
+  // viewer.spin();
+
+  // return (0);
 }

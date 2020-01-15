@@ -1,11 +1,11 @@
 #include "time.h"
+#include <pcl/io/pcd_io.h>
 #include "cluster_extraction.h"
 
 // License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2015-2017 Intel Corporation. All Rights Reserved.
 
-#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
-#include "example.hpp"          // Include short list of convenience functions for rendering
+#include <librealsense2/rs.hpp> // Include RealSense Cross Platform Application
 
 #include <algorithm>            // std::min, std::max
 
@@ -32,7 +32,7 @@ pcl_ptr points_to_pcl(const rs2::points& points)
 }
 
 
-int main(int argc, char * argv[]) try
+int main(int argc, char * argv[])
 {
     // Declare pointcloud object, for calculating pointclouds and texture mappings
     rs2::pointcloud pc;
@@ -69,22 +69,14 @@ int main(int argc, char * argv[]) try
         pcl_ptr cloud = points_to_pcl(points);
         pcl_ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
-        filter_voxel_height(cloud, cloud_filtered);
+        // filter_voxel_height(cloud, cloud_filtered);
         std::vector<pcl::PointIndices> cluster_groupings;
-        find_clusters(cloud_filtered, cluster_groupings);
+        // find_clusters(cloud_filtered, cluster_groupings);
+        pcl::PCDWriter writer;
+        writer.write<pcl::PointXYZ> ("test_pcd.pcd", *cloud, false);
+        break;
+        // visualize_pc_clusters(cluster_groupings, cloud_filtered);
     }
 
     return EXIT_SUCCESS;
 }
-catch (const rs2::error & e)
-{
-    std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n    " << e.what() << std::endl;
-    return EXIT_FAILURE;
-}
-catch (const std::exception & e)
-{
-    std::cerr << e.what() << std::endl;
-    return EXIT_FAILURE;
-}
-
-
