@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) {
   // Visualize bare point cloud
   pcl::visualization::PCLVisualizer viewer("Cloud Viewer");
   pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(
-      cloud_filtered, 255, 255, 255);
-  viewer.addPointCloud (cloud_filtered, single_color, "View PC");// note that before it was showCloud
+      cloud, 255, 255, 255);
+  viewer.addPointCloud (cloud, single_color, "View PC");// note that before it was showCloud
   viewer.spin();
   return 0;
   

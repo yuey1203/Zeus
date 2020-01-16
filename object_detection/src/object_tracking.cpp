@@ -6,6 +6,7 @@
 // Copyright(c) 2015-2017 Intel Corporation. All Rights Reserved.
 
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform Application
+#include <pcl/visualization/pcl_visualizer.h>
 
 #include <algorithm>            // std::min, std::max
 
@@ -46,6 +47,8 @@ int main(int argc, char * argv[])
 
     bool running = true;
 
+    pcl::visualization::PCLVisualizer viewer("Cloud Viewer");
+
     while (running) // Application still alive?
     {
         // Wait for the next set of frames from the camera
@@ -70,11 +73,16 @@ int main(int argc, char * argv[])
         pcl_ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
         // filter_voxel_height(cloud, cloud_filtered);
-        std::vector<pcl::PointIndices> cluster_groupings;
+        // std::vector<pcl::PointIndices> cluster_groupings;
         // find_clusters(cloud_filtered, cluster_groupings);
-        pcl::PCDWriter writer;
-        writer.write<pcl::PointXYZ> ("test_pcd.pcd", *cloud, false);
-        break;
+        // pcl::PCDWriter writer;
+        // writer.write<pcl::PointXYZ> ("test_pcd.pcd", *cloud, false);
+          
+        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(
+            cloud, 255, 255, 255);
+        viewer.addPointCloud (cloud, single_color, "View PC");// note that before it was showCloud
+        viewer.spin();
+        viewer.removePointCloud ("View PC");
         // visualize_pc_clusters(cluster_groupings, cloud_filtered);
     }
 
