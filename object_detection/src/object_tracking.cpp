@@ -32,7 +32,6 @@ pcl_ptr points_to_pcl(const rs2::points& points)
     return cloud;
 }
 
-
 int main(int argc, char * argv[])
 {
     // Declare pointcloud object, for calculating pointclouds and texture mappings
@@ -73,17 +72,18 @@ int main(int argc, char * argv[])
         pcl_ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
         // filter_voxel_height(cloud, cloud_filtered);
-        // std::vector<pcl::PointIndices> cluster_groupings;
-        // find_clusters(cloud_filtered, cluster_groupings);
+        std::vector<pcl::PointIndices> cluster_groupings;
+        find_clusters(cloud, cluster_groupings);
         // pcl::PCDWriter writer;
         // writer.write<pcl::PointXYZ> ("test_pcd.pcd", *cloud, false);
           
         pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(
             cloud, 255, 255, 255);
+        printf("Number of points: %ld\n", cloud->points.size());
         viewer.addPointCloud (cloud, single_color, "View PC");// note that before it was showCloud
         viewer.spin();
         viewer.removePointCloud ("View PC");
-        // visualize_pc_clusters(cluster_groupings, cloud_filtered);
+        // visualize_pc_clusters(cluster_groupings, cloud);
     }
 
     return EXIT_SUCCESS;

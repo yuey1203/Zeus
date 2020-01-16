@@ -52,6 +52,7 @@ target_link_libraries (object_tracking
 
 add_executable (test_realsense  
     src/test_realsense.cpp
+    src/cluster_extraction.cpp
 )
 target_link_libraries (test_realsense 
     ${realsense2_LIBRARY}
